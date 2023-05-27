@@ -112,14 +112,14 @@ reset()async{
       final age = result['age'] as int;
       final ageModel = AgeModel(name, age);
       ageModels.add(ageModel);
-      print(ageModels.toString());
+
     }
     for (final result2 in data) {
       final name = result2['name'] as String;
       final age = double.parse(result2['num'] as String);
       final ageModel = ChartData(name, age);
       pieModels.add(ageModel);
-      print(pieModels.toString());
+
     }
   }
 
