@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:page_transition/page_transition.dart';
@@ -58,7 +62,7 @@ class ShowSTD extends StatelessWidget {
 
               },
               color: Colors.green,
-              child: Icon(Icons.data_usage,color: Colors.white,)
+              child: const Icon(Icons.data_usage,color: Colors.white,)
             ),
           ),
         ],
@@ -71,54 +75,60 @@ class ShowSTD extends StatelessWidget {
               itemBuilder: (context, index) {
                 return BlocBuilder<AppCubit, AppState>(
                   builder: (context, state) {
-                    return Dismissible(
-                      onDismissed: (DismissDirection ind){
-                        AppCubit.get(context).deleteDatabase(id: AppCubit.get(context).data[index]["id"]);
-                        AppCubit.get(context).reset();
-                      },
-                      key: Key(AppCubit.get(context).data[index].toString()),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.lightBlueAccent,
-                            radius: 45,
-                            child: Center(
-                              child: Text(
-                                "${AppCubit.get(context).data[index]["name"].toString().substring(0, 1)}",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    return ConditionalBuilder(
+                      condition: AppCubit.get(context).data.isNotEmpty,
+                      builder: (context) {
+                        return Dismissible(
+                          onDismissed: (DismissDirection ind){
+                            AppCubit.get(context).deleteDatabase(id: AppCubit.get(context).data[index]["id"]);
+                            AppCubit.get(context).reset();
+                          },
+                          key: Key(AppCubit.get(context).data[index]["id"].toString()),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
                             children: [
-                              Text(AppCubit.get(context)
-                                  .data[index]["name"]
-                                  .toString()),
-                              const SizedBox(
-                                height: 25,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                      "رقم الطالب : ${AppCubit.get(context).data[index]["num"]}"),
-                                  SizedBox(
-                                    width: 15,
+                              CircleAvatar(
+                                backgroundColor: Colors.lightBlueAccent,
+                                radius: 45,
+                                child: Center(
+                                  child: Text(
+                                    AppCubit.get(context).data[index]["name"].toString().substring(0, 1),
+                                    style: const TextStyle(color: Colors.white),
                                   ),
-                                  Text(
-                                      "عمر الطالب : ${AppCubit.get(context).data[index]["age"]}",
-                                      style: TextStyle(color: Colors.grey)),
-                                ],
+                                ),
                               ),
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(AppCubit.get(context)
+                                      .data[index]["name"]
+                                      .toString()),
+                                  const SizedBox(
+                                    height: 25,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                          "رقم الطالب : ${AppCubit.get(context).data[index]["num"]}"),
+                                      SizedBox(
+                                        width: 15,
+                                      ),
+                                      Text(
+                                          "عمر الطالب : ${AppCubit.get(context).data[index]["age"]}",
+                                          style: TextStyle(color: Colors.grey)),
+                                    ],
+                                  ),
+                                ],
+                              )
                             ],
-                          )
-                        ],
-                      ),
+                          ),
+                        );
+                      },
+                      fallback: (context) => Platform.isIOS ? const CupertinoActivityIndicator() : const CircularProgressIndicator() ,
                     );
                   },
                 );
